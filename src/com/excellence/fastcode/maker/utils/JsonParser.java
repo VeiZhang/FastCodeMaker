@@ -107,16 +107,17 @@ public class JsonParser {
             success = true;
         }
 
+        return success;
+    }
+
+    public String parse() {
         Collections.sort(mFastCodeList, new Comparator<FastCode>() {
             @Override
             public int compare(FastCode o1, FastCode o2) {
                 return o1.getCode().compareTo(o2.getCode());
             }
         });
-        return success;
-    }
 
-    public String parse() {
         Gson gson = new Gson();
         return formatJson(gson.toJson(mFastCodeList));
     }
