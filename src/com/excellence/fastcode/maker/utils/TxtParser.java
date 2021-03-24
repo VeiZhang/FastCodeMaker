@@ -84,6 +84,7 @@ public class TxtParser {
                     }
                     List<FastCode.Server> fastCodeList = mFastCodeMap.get(code);
                     fastCodeList.add(item.getValue());
+                    break;
                 }
             } else {
                 line = br.readLine();
