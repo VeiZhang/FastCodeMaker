@@ -2,11 +2,13 @@ package com.excellence.fastcode.maker;
 
 
 import com.excellence.fastcode.maker.events.FileDragEventHandler;
-import com.excellence.fastcode.maker.utils.Alert;
+import com.excellence.fastcode.maker.utils.AlertKit;
 import com.excellence.fastcode.maker.utils.JsonParser;
+import com.excellence.fastcode.maker.utils.TxtParser;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -61,7 +63,7 @@ public class Controller implements Initializable {
         /**
          * 拖拽文件到编辑框，显示路径
          */
-        root.setOnDragOver(new FileDragEventHandler("*.txt", "*.json"));
+        root.setOnDragOver(new FileDragEventHandler("*.json", "*.txt"));
     }
 
     private void loadFastCodeFile() {
@@ -77,7 +79,7 @@ public class Controller implements Initializable {
         } catch (Exception exception) {
             fastcodeFilePathTv.setText(null);
             contentTv.setText(null);
-            Alert.showErrorAlert(exception);
+            AlertKit.showErrorAlert("Parse file error", exception);
         }
     }
 
@@ -95,8 +97,8 @@ public class Controller implements Initializable {
         return null;
     }
 
-    public void selectEvent(ActionEvent event) {
-        File file = getChooserFile("Txt or Json file", "*.txt", "*.json");
+    public void selectFileEvent(ActionEvent event) {
+        File file = getChooserFile("Json or Txt file", "*.json", "*.txt");
         if (file != null) {
             fastcodeFilePathTv.setText(file.getPath());
             loadFastCodeFile();
@@ -104,15 +106,11 @@ public class Controller implements Initializable {
     }
 
     private File getChooserFile(final String description, final String... extensions) {
-        FileChooser fileChooser = new FileChooser();
-        if (mFileChooserInitPath != null) {
-            File initFile = new File(mFileChooserInitPath);
-            if (initFile.exists()) {
-                fileChooser.setInitialDirectory(initFile);
-            }
-        }
+        FileChooser fileChooser = newFileChooser();
+
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(description, extensions);
         fileChooser.getExtensionFilters().add(extensionFilter);
+
         File selectedFile = fileChooser.showOpenDialog(mPrimaryStage);
         if (selectedFile != null) {
             mFileChooserInitPath = selectedFile.getParent();
@@ -120,4 +118,47 @@ public class Controller implements Initializable {
         return selectedFile;
     }
 
+    private FileChooser newFileChooser() {
+        FileChooser fileChooser = new FileChooser();
+        if (mFileChooserInitPath != null) {
+            File initFile = new File(mFileChooserInitPath);
+            if (initFile.exists()) {
+                fileChooser.setInitialDirectory(initFile);
+            }
+        }
+        return fileChooser;
+    }
+
+    public void saveFileEvent(ActionEvent actionEvent) {
+        FileChooser fileChooser = newFileChooser();
+        fileChooser.setInitialFileName("maker_fastcode");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Json file", "*.json"),
+                new FileChooser.ExtensionFilter("Txt file", "*.txt"));
+
+        File savedFile = fileChooser.showSaveDialog(mPrimaryStage);
+        String jsonContent = contentTv.getText();
+
+        if (savedFile != null) {
+            if (jsonContent == null || jsonContent.length() == 0) {
+                AlertKit.showErrorAlert("Content is empty", null);
+            } else {
+                mFileChooserInitPath = savedFile.getParent();
+                saveFile(savedFile, jsonContent, fileChooser.getSelectedExtensionFilter().getExtensions());
+            }
+        }
+    }
+
+    private void saveFile(File savedFile, String jsonContent, List<String> extensions) {
+        if (savedFile != null) {
+            if (extensions != null && extensions.size() > 0) {
+                if (extensions.get(0).equals("*.txt")) {
+                    TxtParser.saveFile(savedFile, jsonContent);
+                    return;
+                }
+            }
+
+            JsonParser.saveFile(savedFile, jsonContent);
+        }
+    }
 }

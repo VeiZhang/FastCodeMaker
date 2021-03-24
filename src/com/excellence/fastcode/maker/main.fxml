@@ -15,7 +15,7 @@
                    promptText="Edit fastcode file"/>
         <Button fx:id="openFastcodeFileBtn" layoutX="400.0" layoutY="30.0" mnemonicParsing="false"
                 text="Load fastcode file"
-                onAction="#selectEvent"
+                onAction="#selectFileEvent"
                 AnchorPane.rightAnchor="30.0"/>
 
         <Label layoutX="30.0" layoutY="80.0" text="Code">
@@ -80,7 +80,7 @@
                   wrapText="false"/>
 
         <Button fx:id="exportFileBtn" layoutX="190.0" layoutY="543.0" mnemonicParsing="false" prefHeight="36.0"
-                prefWidth="140.0"
+                prefWidth="140.0" onAction="#saveFileEvent"
                 text="Export fastcode file">
             <font>
                 <Font name="System Bold"/>

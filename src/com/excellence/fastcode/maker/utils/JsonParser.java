@@ -4,7 +4,9 @@ import com.excellence.fastcode.maker.entity.FastCode;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
@@ -103,7 +105,17 @@ public class JsonParser {
      */
     private static void addIndentBlank(StringBuilder sb, int indent) {
         for (int i = 0; i < indent; i++) {
-            sb.append("    ");
+            sb.append("  ");
+        }
+    }
+
+    public static void saveFile(File savedFile, String content) {
+        try {
+            FileOutputStream os = new FileOutputStream(savedFile);
+            os.write(content.getBytes());
+            os.close();
+        } catch (Exception e) {
+            AlertKit.showErrorAlert("Save file error", e);
         }
     }
 }

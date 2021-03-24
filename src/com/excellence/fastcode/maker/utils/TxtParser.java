@@ -1,5 +1,7 @@
 package com.excellence.fastcode.maker.utils;
 
+import java.io.File;
+
 /**
  * <pre>
  *     author : VeiZhang
@@ -9,4 +11,8 @@ package com.excellence.fastcode.maker.utils;
  * </pre> 
  */
 public class TxtParser {
+    
+    public static void saveFile(File savedFile, String content) {
+
+    }
 }
