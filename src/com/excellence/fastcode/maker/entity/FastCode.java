@@ -1,6 +1,7 @@
 package com.excellence.fastcode.maker.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Slim on 2019/2/22
@@ -95,6 +96,23 @@ public class FastCode {
                     ", user_name='" + user_name + '\'' +
                     ", user_password='" + user_password + '\'' +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Server server = (Server) o;
+            return Objects.equals(server_name, server.server_name) &&
+                    Objects.equals(server_url, server.server_url) &&
+                    Objects.equals(server_mac, server.server_mac) &&
+                    Objects.equals(user_name, server.user_name) &&
+                    Objects.equals(user_password, server.user_password);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(server_name, server_url, server_mac, user_name, user_password);
         }
     }
 

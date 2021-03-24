@@ -1,6 +1,7 @@
 package com.excellence.fastcode.maker;
 
 
+import com.excellence.fastcode.maker.entity.FastCode;
 import com.excellence.fastcode.maker.events.FileDragEventHandler;
 import com.excellence.fastcode.maker.utils.AlertKit;
 import com.excellence.fastcode.maker.utils.JsonParser;
@@ -22,6 +23,9 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import static com.excellence.fastcode.maker.utils.EmptyUtils.isEmpty;
+import static com.excellence.fastcode.maker.utils.EmptyUtils.isNotEmpty;
 
 public class Controller implements Initializable {
 
@@ -53,6 +57,7 @@ public class Controller implements Initializable {
 
     private Stage mPrimaryStage;
     private String mFileChooserInitPath = null;
+    private final JsonParser mJsonParser = JsonParser.newInstance();
 
     public void setStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
@@ -73,7 +78,7 @@ public class Controller implements Initializable {
             if (path.endsWith(".txt")) {
 
             } else {
-                content = JsonParser.parse(path);
+                content = mJsonParser.parse(new File(path));
             }
             contentTv.setText(content);
         } catch (Exception exception) {
@@ -140,8 +145,8 @@ public class Controller implements Initializable {
         String jsonContent = contentTv.getText();
 
         if (savedFile != null) {
-            if (jsonContent == null || jsonContent.length() == 0) {
-                AlertKit.showErrorAlert("Content is empty", null);
+            if (isEmpty(jsonContent)) {
+                AlertKit.showErrorAlert("Content can't be empty");
             } else {
                 mFileChooserInitPath = savedFile.getParent();
                 saveFile(savedFile, jsonContent, fileChooser.getSelectedExtensionFilter().getExtensions());
@@ -151,7 +156,7 @@ public class Controller implements Initializable {
 
     private void saveFile(File savedFile, String jsonContent, List<String> extensions) {
         if (savedFile != null) {
-            if (extensions != null && extensions.size() > 0) {
+            if (isNotEmpty(extensions)) {
                 if (extensions.get(0).equals("*.txt")) {
                     TxtParser.saveFile(savedFile, jsonContent);
                     return;
@@ -160,5 +165,39 @@ public class Controller implements Initializable {
 
             JsonParser.saveFile(savedFile, jsonContent);
         }
+    }
+
+    public void addItemEvent(ActionEvent actionEvent) {
+        String code = codeTv.getText();
+        String serverURL = serverUrlTv.getText();
+        String serverName = serverNameTv.getText();
+        String mac = macTv.getText();
+        String userName = userNameTv.getText();
+        String password = passwordTv.getText();
+
+        if (isEmpty(code)) {
+            AlertKit.showErrorAlert("Code can't be empty");
+            return;
+        }
+
+        if (isEmpty(serverURL)) {
+            AlertKit.showErrorAlert("Server URL can't be empty");
+            return;
+        }
+
+        FastCode.Server server = new FastCode.Server();
+        server.setServer_url(isEmpty(serverURL) ? null : serverURL);
+        server.setServer_name(isEmpty(serverName) ? null : serverName);
+        server.setServer_mac(isEmpty(mac) ? null : mac);
+        server.setUser_name(isEmpty(userName) ? null : userName);
+        server.setUser_password(isEmpty(password) ? null : password);
+
+        if (mJsonParser.addItem(code, server)) {
+            contentTv.setText(mJsonParser.parse());
+        }
+
+        String content = contentTv.getText();
+        String codeContent = String.format("\"code\":\"%s\"", code);
+        contentTv.selectRange(content.indexOf(codeContent), content.indexOf(codeContent) + codeContent.length());
     }
 }

@@ -8,7 +8,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import static com.excellence.fastcode.maker.utils.EmptyUtils.isEmpty;
 
 /**
  * <pre>
@@ -20,19 +25,74 @@ import java.util.List;
  */
 public class JsonParser {
 
-    public static String json(String content) {
-        return "";
-    }
+    private List<FastCode> mFastCodeList = new ArrayList<>();
 
-    public static String parse(String filePath) throws Exception {
-        Gson gson = new Gson();
-        List<FastCode> fastCodeList = gson.fromJson(new InputStreamReader(new FileInputStream(filePath)),
-                new TypeToken<List<FastCode>>() {
-                }.getType());
-        return formatJson(gson.toJson(fastCodeList));
+    public static JsonParser newInstance() {
+        return new JsonParser();
     }
 
     private JsonParser() {
+    }
+
+    public String parse(File file) throws Exception {
+        Gson gson = new Gson();
+        mFastCodeList = gson.fromJson(new InputStreamReader(new FileInputStream(file)),
+                new TypeToken<List<FastCode>>() {
+                }.getType());
+        return formatJson(gson.toJson(mFastCodeList));
+    }
+
+    public boolean addItem(String code, FastCode.Server serverItem) {
+        boolean success = false;
+        if (mFastCodeList == null
+                || isEmpty(code) || isEmpty(serverItem)) {
+            return success;
+        }
+
+        boolean codeExist = false;
+        for (FastCode fastCode : mFastCodeList) {
+            if (fastCode.getCode().equals(code)) {
+                codeExist = true;
+
+                boolean isExist = false;
+                if (fastCode.getServers() == null) {
+                    fastCode.setServers(new ArrayList<FastCode.Server>());
+                }
+
+                for (FastCode.Server server : fastCode.getServers()) {
+                    if (server.equals(serverItem)) {
+                        isExist = true;
+                    }
+                }
+                if (!isExist) {
+                    fastCode.getServers().add(serverItem);
+                    success = true;
+                }
+            }
+        }
+        if (!codeExist) {
+            FastCode fastCode = new FastCode();
+            fastCode.setCode(code);
+            List<FastCode.Server> serverList = new ArrayList<>();
+            serverList.add(serverItem);
+            fastCode.setServers(serverList);
+
+            mFastCodeList.add(fastCode);
+            success = true;
+        }
+
+        Collections.sort(mFastCodeList, new Comparator<FastCode>() {
+            @Override
+            public int compare(FastCode o1, FastCode o2) {
+                return o1.getCode().compareTo(o2.getCode());
+            }
+        });
+        return success;
+    }
+
+    public String parse() {
+        Gson gson = new Gson();
+        return formatJson(gson.toJson(mFastCodeList));
     }
 
     /**

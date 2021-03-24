@@ -17,6 +17,10 @@ import javafx.scene.layout.Priority;
  */
 public class AlertKit {
 
+    public static void showErrorAlert(String headerText) {
+        showErrorAlert(headerText, null);
+    }
+
     public static void showErrorAlert(String headerText, Throwable e) {
         showErrorAlert("Warning", headerText, e);
     }
