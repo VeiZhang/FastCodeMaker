@@ -58,6 +58,7 @@ public class Controller implements Initializable {
     private Stage mPrimaryStage;
     private String mFileChooserInitPath = null;
     private final JsonParser mJsonParser = JsonParser.newInstance();
+    private final TxtParser mTxtParser = TxtParser.newInstance();
 
     public void setStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
@@ -76,7 +77,7 @@ public class Controller implements Initializable {
         try {
             String content = "";
             if (path.endsWith(".txt")) {
-
+                content = mJsonParser.parse(mTxtParser.parse(new File(path)));
             } else {
                 content = mJsonParser.parse(new File(path));
             }
@@ -158,7 +159,7 @@ public class Controller implements Initializable {
         if (savedFile != null) {
             if (isNotEmpty(extensions)) {
                 if (extensions.get(0).equals("*.txt")) {
-                    TxtParser.saveFile(savedFile, jsonContent);
+                    TxtParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                     return;
                 }
             }
@@ -180,6 +181,7 @@ public class Controller implements Initializable {
             return;
         }
 
+        selectContentCode(code);
         if (isEmpty(serverURL)) {
             AlertKit.showErrorAlert("Server URL can't be empty");
             return;
@@ -196,8 +198,15 @@ public class Controller implements Initializable {
             contentTv.setText(mJsonParser.parse());
         }
 
+        selectContentCode(code);
+    }
+
+    private void selectContentCode(String code) {
         String content = contentTv.getText();
         String codeContent = String.format("\"code\":\"%s\"", code);
-        contentTv.selectRange(content.indexOf(codeContent), content.indexOf(codeContent) + codeContent.length());
+        int index = content.indexOf(codeContent);
+        if (index >= 0) {
+            contentTv.selectRange(index, index + codeContent.length());
+        }
     }
 }

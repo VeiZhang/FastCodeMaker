@@ -25,6 +25,23 @@ import static com.excellence.fastcode.maker.utils.EmptyUtils.isEmpty;
  */
 public class JsonParser {
 
+    /**
+     * [
+     *   {
+     *     "code":"1",
+     *     "servers":[
+     *       {
+     *         "server_name":"Hello",
+     *         "server_url":"http://1.com",
+     *         "server_mac":"11:11:11:11:11:11",
+     *         "user_name":"Test",
+     *         "user_password":"123"
+     *       }
+     *     ]
+     *   }
+     * ]
+     */
+
     private List<FastCode> mFastCodeList = new ArrayList<>();
 
     public static JsonParser newInstance() {
@@ -40,6 +57,15 @@ public class JsonParser {
                 new TypeToken<List<FastCode>>() {
                 }.getType());
         return formatJson(gson.toJson(mFastCodeList));
+    }
+
+    public String parse(List<FastCode> fastCodeList) {
+        mFastCodeList = fastCodeList;
+        return parse();
+    }
+
+    public List<FastCode> getFastCodeList() {
+        return mFastCodeList;
     }
 
     public boolean addItem(String code, FastCode.Server serverItem) {
