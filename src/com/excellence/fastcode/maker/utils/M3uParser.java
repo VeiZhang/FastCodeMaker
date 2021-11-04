@@ -20,7 +20,7 @@ import static com.excellence.fastcode.maker.utils.EmptyUtils.isEmpty;
  *     desc   :
  * </pre> 
  */
-public class TxtParser {
+public class M3uParser {
 
     /**
      * #FASTCODE:-1 code-ID="0002" server-name="22" server-mac="11:11:79:aa:99:aa" user-name="test2" user-password="123"
@@ -43,11 +43,11 @@ public class TxtParser {
 
     private Map<String, List<FastCode.Server>> mFastCodeMap = new LinkedHashMap<>();
 
-    public static TxtParser newInstance() {
-        return new TxtParser();
+    public static M3uParser newInstance() {
+        return new M3uParser();
     }
 
-    private TxtParser() {
+    private M3uParser() {
     }
 
     /**

@@ -5,7 +5,7 @@ import com.excellence.fastcode.maker.entity.FastCode;
 import com.excellence.fastcode.maker.events.FileDragEventHandler;
 import com.excellence.fastcode.maker.utils.AlertKit;
 import com.excellence.fastcode.maker.utils.JsonParser;
-import com.excellence.fastcode.maker.utils.TxtParser;
+import com.excellence.fastcode.maker.utils.M3uParser;
 
 import java.io.File;
 import java.net.URL;
@@ -28,6 +28,9 @@ import static com.excellence.fastcode.maker.utils.EmptyUtils.isEmpty;
 import static com.excellence.fastcode.maker.utils.EmptyUtils.isNotEmpty;
 
 public class Controller implements Initializable {
+
+    private static final String SUFFIX_M3U = ".m3u";
+    private static final String SUFFIX_JSON = ".json";
 
     @FXML
     private TextField fastcodeFilePathTv;
@@ -58,7 +61,7 @@ public class Controller implements Initializable {
     private Stage mPrimaryStage;
     private String mFileChooserInitPath = null;
     private final JsonParser mJsonParser = JsonParser.newInstance();
-    private final TxtParser mTxtParser = TxtParser.newInstance();
+    private final M3uParser mM3uParser = M3uParser.newInstance();
 
     public void setStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
@@ -69,17 +72,19 @@ public class Controller implements Initializable {
         /**
          * 拖拽文件到编辑框，显示路径
          */
-        root.setOnDragOver(new FileDragEventHandler("*.json", "*.txt"));
+        root.setOnDragOver(new FileDragEventHandler("*.json", "*.txt", "*.m3u"));
     }
 
     private void loadFastCodeFile() {
         String path = fastcodeFilePathTv.getText();
         try {
             String content = "";
-            if (path.endsWith(".txt")) {
-                content = mJsonParser.parse(mTxtParser.parse(new File(path)));
-            } else {
+            if (path.endsWith(SUFFIX_M3U)) {
+                content = mJsonParser.parse(mM3uParser.parse(new File(path)));
+            } else if (path.endsWith(SUFFIX_JSON)) {
                 content = mJsonParser.parse(new File(path));
+            } else {
+
             }
             contentTv.setText(content);
         } catch (Exception exception) {
@@ -104,7 +109,7 @@ public class Controller implements Initializable {
     }
 
     public void selectFileEvent(ActionEvent event) {
-        File file = getChooserFile("Json or Txt file", "*.json", "*.txt");
+        File file = getChooserFile("Json Txt or m3u file", "*.json", "*.txt", "*.m3u");
         if (file != null) {
             fastcodeFilePathTv.setText(file.getPath());
             loadFastCodeFile();
@@ -140,7 +145,8 @@ public class Controller implements Initializable {
         fileChooser.setInitialFileName("maker_fastcode");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Json file", "*.json"),
-                new FileChooser.ExtensionFilter("Txt file", "*.txt"));
+                new FileChooser.ExtensionFilter("Txt file", "*.txt"),
+                new FileChooser.ExtensionFilter("m3u file", "*.m3u"));
 
         File savedFile = fileChooser.showSaveDialog(mPrimaryStage);
         String jsonContent = contentTv.getText();
@@ -158,13 +164,13 @@ public class Controller implements Initializable {
     private void saveFile(File savedFile, String jsonContent, List<String> extensions) {
         if (savedFile != null) {
             if (isNotEmpty(extensions)) {
-                if (extensions.get(0).equals("*.txt")) {
-                    TxtParser.saveFile(savedFile, mJsonParser.getFastCodeList());
-                    return;
+                String path = extensions.get(0);
+                if (path.equals(SUFFIX_JSON)) {
+                    JsonParser.saveFile(savedFile, jsonContent);
+                } else if (path.equals(SUFFIX_M3U)) {
+                    M3uParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                 }
             }
-
-            JsonParser.saveFile(savedFile, jsonContent);
         }
     }
 
