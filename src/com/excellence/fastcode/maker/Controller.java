@@ -6,6 +6,7 @@ import com.excellence.fastcode.maker.events.FileDragEventHandler;
 import com.excellence.fastcode.maker.utils.AlertKit;
 import com.excellence.fastcode.maker.utils.JsonParser;
 import com.excellence.fastcode.maker.utils.M3uParser;
+import com.excellence.fastcode.maker.utils.TxtParser;
 
 import java.io.File;
 import java.net.URL;
@@ -62,6 +63,7 @@ public class Controller implements Initializable {
     private String mFileChooserInitPath = null;
     private final JsonParser mJsonParser = JsonParser.newInstance();
     private final M3uParser mM3uParser = M3uParser.newInstance();
+    private final TxtParser mTxtParser = TxtParser.newInstance();
 
     public void setStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
@@ -79,12 +81,14 @@ public class Controller implements Initializable {
         String path = fastcodeFilePathTv.getText();
         try {
             String content = "";
-            if (path.endsWith(SUFFIX_M3U)) {
-                content = mJsonParser.parse(mM3uParser.parse(new File(path)));
-            } else if (path.endsWith(SUFFIX_JSON)) {
-                content = mJsonParser.parse(new File(path));
-            } else {
 
+            File pathFile = new File(path);
+            if (path.endsWith(SUFFIX_M3U)) {
+                content = mJsonParser.parse(mM3uParser.parse(pathFile));
+            } else if (path.endsWith(SUFFIX_JSON)) {
+                content = mJsonParser.parse(pathFile);
+            } else {
+                content = mJsonParser.parse(mTxtParser.parse(pathFile));
             }
             contentTv.setText(content);
         } catch (Exception exception) {
@@ -164,11 +168,19 @@ public class Controller implements Initializable {
     private void saveFile(File savedFile, String jsonContent, List<String> extensions) {
         if (savedFile != null) {
             if (isNotEmpty(extensions)) {
-                String path = extensions.get(0);
-                if (path.equals(SUFFIX_JSON)) {
-                    JsonParser.saveFile(savedFile, jsonContent);
-                } else if (path.equals(SUFFIX_M3U)) {
-                    M3uParser.saveFile(savedFile, mJsonParser.getFastCodeList());
+                String suffix = extensions.get(0);
+                try {
+                    if (suffix.endsWith(SUFFIX_JSON)) {
+                        JsonParser.saveFile(savedFile, jsonContent);
+                    } else if (suffix.endsWith(SUFFIX_M3U)) {
+                        M3uParser.saveFile(savedFile, mJsonParser.getFastCodeList());
+                    } else {
+                        TxtParser.saveFile(savedFile, mJsonParser.getFastCodeList());
+                    }
+
+                    Runtime.getRuntime().exec(String.format("explorer.exe /select,%s", savedFile));
+                } catch (Exception e) {
+                    AlertKit.showErrorAlert("Save file error", e);
                 }
             }
         }

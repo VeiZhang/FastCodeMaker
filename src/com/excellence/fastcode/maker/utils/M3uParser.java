@@ -25,6 +25,9 @@ public class M3uParser {
     /**
      * #FASTCODE:-1 code-ID="0002" server-name="22" server-mac="11:11:79:aa:99:aa" user-name="test2" user-password="123"
      * http://test2:1/c/
+     *
+     * #FASTCODE:···
+     * ···
      */
 
     private static final String EXT_INF = "#FASTCODE:";
@@ -207,32 +210,28 @@ public class M3uParser {
         return value;
     }
 
-    public static void saveFile(File savedFile, List<FastCode> fastCodeList) {
-        try {
-            StringBuilder content = new StringBuilder();
-            for (FastCode item : fastCodeList) {
+    public static void saveFile(File savedFile, List<FastCode> fastCodeList) throws Exception {
+        StringBuilder content = new StringBuilder();
+        for (FastCode item : fastCodeList) {
 
-                for (FastCode.Server server : item.getServers()) {
-                    String serverName = isEmpty(server.getServer_name()) ? "" : server.getServer_name();
-                    String mac = isEmpty(server.getServer_mac()) ? "" : server.getServer_mac();
-                    String userName = isEmpty(server.getUser_name()) ? "" : server.getUser_name();
-                    String password = isEmpty(server.getUser_password()) ? "" : server.getUser_password();
-                    String url = isEmpty(server.getServer_url()) ? "" : server.getServer_url();
+            for (FastCode.Server server : item.getServers()) {
+                String serverName = isEmpty(server.getServer_name()) ? "" : server.getServer_name();
+                String mac = isEmpty(server.getServer_mac()) ? "" : server.getServer_mac();
+                String userName = isEmpty(server.getUser_name()) ? "" : server.getUser_name();
+                String password = isEmpty(server.getUser_password()) ? "" : server.getUser_password();
+                String url = isEmpty(server.getServer_url()) ? "" : server.getServer_url();
 
-                    String itemLine = String.format("#FASTCODE:-1 code-ID=\"%s\" server-name=\"%s\" server-mac=\"%s\" user-name=\"%s\" user-password=\"%s\"\n%s",
-                            item.getCode(), serverName, mac, userName, password, url);
-                    if (fastCodeList.indexOf(item) != fastCodeList.size() - 1) {
-                        itemLine += "\n";
-                    }
-                    content.append(itemLine);
+                String itemLine = String.format("#FASTCODE:-1 code-ID=\"%s\" server-name=\"%s\" server-mac=\"%s\" user-name=\"%s\" user-password=\"%s\"\n%s",
+                        item.getCode(), serverName, mac, userName, password, url);
+                if (fastCodeList.indexOf(item) != fastCodeList.size() - 1) {
+                    itemLine += "\n";
                 }
+                content.append(itemLine);
             }
-
-            FileOutputStream os = new FileOutputStream(savedFile);
-            os.write(content.toString().getBytes());
-            os.close();
-        } catch (Exception e) {
-            AlertKit.showErrorAlert("Save file error", e);
         }
+
+        FileOutputStream os = new FileOutputStream(savedFile);
+        os.write(content.toString().getBytes());
+        os.close();
     }
 }

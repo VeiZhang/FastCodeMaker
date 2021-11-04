@@ -196,13 +196,9 @@ public class JsonParser {
         }
     }
 
-    public static void saveFile(File savedFile, String content) {
-        try {
-            FileOutputStream os = new FileOutputStream(savedFile);
-            os.write(content.getBytes());
-            os.close();
-        } catch (Exception e) {
-            AlertKit.showErrorAlert("Save file error", e);
-        }
+    public static void saveFile(File savedFile, String content) throws Exception {
+        FileOutputStream os = new FileOutputStream(savedFile);
+        os.write(content.getBytes());
+        os.close();
     }
 }
