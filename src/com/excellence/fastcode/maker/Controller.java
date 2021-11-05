@@ -182,6 +182,14 @@ public class Controller implements Initializable {
                         TxtParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                     }
 
+                    /**
+                     * 打开缓慢
+                     */
+//                    Desktop.getDesktop().open(savedFile.getParentFile());
+
+                    /**
+                     * 会报警告
+                     */
                     Runtime.getRuntime().exec(String.format("explorer.exe /select,%s", savedFile));
                 } catch (Exception e) {
                     AlertKit.showErrorAlert("Save file error", e);
