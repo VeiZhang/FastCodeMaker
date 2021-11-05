@@ -24,7 +24,7 @@ public class TxtParser {
 
     /**
      * #FASTCODE
-     * code-ID="0002"
+     * code="0002"
      * server-name="22"
      * server-url="http://test2:1/c/"
      * server-mac="11:11:79:aa:99:aa"
@@ -43,7 +43,7 @@ public class TxtParser {
     private static final String EXT_NEW_LINE = "\n";
     private static final String EXT_EQUAL = "=";
 
-    private static final String ATTR_ID = "code-ID";
+    private static final String ATTR_ID = "code";
     private static final String ATTR_SERVER_NAME = "server-name";
     private static final String ATTR_SERVER_URL = "server-url";
     private static final String ATTR_SERVER_MAC = "server-mac";
@@ -57,6 +57,32 @@ public class TxtParser {
     }
 
     private TxtParser() {
+    }
+
+    public static String parse(List<FastCode> fastCodeList) {
+        StringBuilder content = new StringBuilder();
+        for (FastCode item : fastCodeList) {
+
+            for (FastCode.Server server : item.getServers()) {
+                String serverName = isEmpty(server.getServer_name()) ? "" : server.getServer_name();
+                String mac = isEmpty(server.getServer_mac()) ? "" : server.getServer_mac();
+                String userName = isEmpty(server.getUser_name()) ? "" : server.getUser_name();
+                String password = isEmpty(server.getUser_password()) ? "" : server.getUser_password();
+                String url = isEmpty(server.getServer_url()) ? "" : server.getServer_url();
+
+                String itemLine = String.format("#FASTCODE\n" +
+                                "code=\"%s\"\n" +
+                                "server-name=\"%s\"\n" +
+                                "server-url=\"%s\"\n" +
+                                "server-mac=\"%s\"\n" +
+                                "user-name=\"%s\"\n" +
+                                "user-password=\"%s\"\n" +
+                                "\n",
+                        item.getCode(), serverName, url, mac, userName, password);
+                content.append(itemLine);
+            }
+        }
+        return content.toString();
     }
 
     public List<FastCode> parse(File file) throws Exception {
@@ -103,14 +129,6 @@ public class TxtParser {
         return fastCodeList;
     }
 
-    /**
-     * code-ID="0002"
-     * server-name="22"
-     * server-url=http://test2:1/c/
-     * server-mac="11:11:79:aa:99:aa"
-     * user-name="test2"
-     * user-password="123"
-     */
     private Pair<String, FastCode.Server> parseInfo(String toString) {
         FastCode.Server item = new FastCode.Server();
 
@@ -142,33 +160,10 @@ public class TxtParser {
     }
 
     public static void saveFile(File savedFile, List<FastCode> fastCodeList) throws Exception {
-        StringBuilder content = new StringBuilder();
-        for (FastCode item : fastCodeList) {
-
-            for (FastCode.Server server : item.getServers()) {
-                String serverName = isEmpty(server.getServer_name()) ? "" : server.getServer_name();
-                String mac = isEmpty(server.getServer_mac()) ? "" : server.getServer_mac();
-                String userName = isEmpty(server.getUser_name()) ? "" : server.getUser_name();
-                String password = isEmpty(server.getUser_password()) ? "" : server.getUser_password();
-                String url = isEmpty(server.getServer_url()) ? "" : server.getServer_url();
-
-                String itemLine = String.format("#FASTCODE\n" +
-                                "code-ID=\"%s\"\n" +
-                                "server-name=\"%s\"\n" +
-                                "server-url=\"%s\"\n" +
-                                "server-mac=\"%s\"\n" +
-                                "user-name=\"%s\"\n" +
-                                "user-password=\"%s\"\n",
-                        item.getCode(), serverName, url, mac, userName, password);
-                if (fastCodeList.indexOf(item) != fastCodeList.size() - 1) {
-                    itemLine += "\n";
-                }
-                content.append(itemLine);
-            }
-        }
+        String content = parse(fastCodeList);
 
         FileOutputStream os = new FileOutputStream(savedFile);
-        os.write(content.toString().getBytes());
+        os.write(content.getBytes());
         os.close();
     }
 }

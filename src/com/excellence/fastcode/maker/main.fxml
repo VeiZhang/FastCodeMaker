@@ -77,10 +77,13 @@
                 onAction="#addItemEvent"
                 AnchorPane.rightAnchor="30.0"/>
 
-        <TextArea fx:id="contentTv" editable="false" layoutX="30.0" layoutY="330.0" prefHeight="200.0" prefWidth="460.0"
+        <Button fx:id="contentTypeBtn" layoutX="30.0" layoutY="315.0" mnemonicParsing="false" text="Type:txt"
+                onAction="#typeChangeEvent"/>
+
+        <TextArea fx:id="contentTv" editable="false" layoutX="30.0" layoutY="340.0" prefHeight="200.0" prefWidth="460.0"
                   wrapText="false"/>
 
-        <Button fx:id="exportFileBtn" layoutX="190.0" layoutY="543.0" mnemonicParsing="false" prefHeight="36.0"
+        <Button fx:id="exportFileBtn" layoutX="190.0" layoutY="553.0" mnemonicParsing="false" prefHeight="36.0"
                 prefWidth="140.0" onAction="#saveFileEvent"
                 text="Export fastcode file">
             <font>

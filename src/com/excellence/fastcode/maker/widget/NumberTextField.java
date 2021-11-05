@@ -13,7 +13,7 @@ import javafx.scene.control.TextField;
 
 public class NumberTextField extends TextField
 {
-	private static final String REGEX_NUM = "[1-9]\\d*$";
+	private static final String REGEX_NUM = "[0-9]\\d*$";
 
 	@Override
 	public void replaceText(int start, int end, String text)

@@ -58,12 +58,16 @@ public class Controller implements Initializable {
     public TextArea contentTv;
     @FXML
     public Button exportFileBtn;
+    @FXML
+    public Button contentTypeBtn;
 
     private Stage mPrimaryStage;
     private String mFileChooserInitPath = null;
     private final JsonParser mJsonParser = JsonParser.newInstance();
     private final M3uParser mM3uParser = M3uParser.newInstance();
     private final TxtParser mTxtParser = TxtParser.newInstance();
+
+    private int mContentType = 0;
 
     public void setStage(Stage primaryStage) {
         mPrimaryStage = primaryStage;
@@ -90,7 +94,7 @@ public class Controller implements Initializable {
             } else {
                 content = mJsonParser.parse(mTxtParser.parse(pathFile));
             }
-            contentTv.setText(content);
+            loadContent();
         } catch (Exception exception) {
             fastcodeFilePathTv.setText(null);
             contentTv.setText(null);
@@ -213,7 +217,7 @@ public class Controller implements Initializable {
         server.setUser_password(isEmpty(password) ? null : password);
 
         if (mJsonParser.addItem(code, server)) {
-            contentTv.setText(mJsonParser.parse());
+            loadContent();
         }
 
         selectContentCode(code);
@@ -222,9 +226,40 @@ public class Controller implements Initializable {
     private void selectContentCode(String code) {
         String content = contentTv.getText();
         String codeContent = String.format("\"code\":\"%s\"", code);
+        if (content.contains("code=")) {
+            codeContent = String.format("code=\"%s\"", code);
+        }
         int index = content.indexOf(codeContent);
         if (index >= 0) {
             contentTv.selectRange(index, index + codeContent.length());
         }
+    }
+
+    public void typeChangeEvent(ActionEvent actionEvent) {
+        mContentType++;
+        loadContent();
+    }
+
+    private void loadContent() {
+        String text = "Type:txt";
+        String jsonContent = mJsonParser.parse();
+        switch (mContentType % 3) {
+            case 0:
+            default:
+                text = "Type:txt";
+                contentTv.setText(TxtParser.parse(mJsonParser.getFastCodeList()));
+                break;
+
+            case 1:
+                text = "Type:json";
+                contentTv.setText(jsonContent);
+                break;
+
+            case 2:
+                text = "Type:m3u";
+                contentTv.setText(M3uParser.parse(mJsonParser.getFastCodeList()));
+                break;
+        }
+        contentTypeBtn.setText(text);
     }
 }
