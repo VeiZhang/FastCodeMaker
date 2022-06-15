@@ -4,9 +4,9 @@ package com.excellence.fastcode.maker;
 import com.excellence.fastcode.maker.entity.FastCode;
 import com.excellence.fastcode.maker.events.FileDragEventHandler;
 import com.excellence.fastcode.maker.utils.AlertKit;
+import com.excellence.fastcode.maker.utils.CustomTxtParser;
 import com.excellence.fastcode.maker.utils.JsonParser;
 import com.excellence.fastcode.maker.utils.M3uParser;
-import com.excellence.fastcode.maker.utils.TxtParser;
 
 import java.io.File;
 import java.net.URL;
@@ -65,7 +65,7 @@ public class Controller implements Initializable {
     private String mFileChooserInitPath = null;
     private final JsonParser mJsonParser = JsonParser.newInstance();
     private final M3uParser mM3uParser = M3uParser.newInstance();
-    private final TxtParser mTxtParser = TxtParser.newInstance();
+    private final CustomTxtParser mCustomTxtParser = CustomTxtParser.newInstance();
 
     private int mContentType = 0;
 
@@ -84,15 +84,13 @@ public class Controller implements Initializable {
     private void loadFastCodeFile() {
         String path = fastcodeFilePathTv.getText();
         try {
-            String content = "";
-
             File pathFile = new File(path);
             if (path.endsWith(SUFFIX_M3U)) {
-                content = mJsonParser.parse(mM3uParser.parse(pathFile));
+                mJsonParser.parse(mM3uParser.parse(pathFile));
             } else if (path.endsWith(SUFFIX_JSON)) {
-                content = mJsonParser.parse(pathFile);
+                mJsonParser.parse(pathFile);
             } else {
-                content = mJsonParser.parse(mTxtParser.parse(pathFile));
+                mJsonParser.parse(mCustomTxtParser.parse(pathFile));
             }
             loadContent();
         } catch (Exception exception) {
@@ -179,7 +177,7 @@ public class Controller implements Initializable {
                     } else if (suffix.endsWith(SUFFIX_M3U)) {
                         M3uParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                     } else {
-                        TxtParser.saveFile(savedFile, mJsonParser.getFastCodeList());
+                        CustomTxtParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                     }
 
                     /**
@@ -249,13 +247,13 @@ public class Controller implements Initializable {
     }
 
     private void loadContent() {
-        String text = "Type:txt";
+        String text = "Custom:txt";
         String jsonContent = mJsonParser.parse();
         switch (mContentType % 3) {
             case 0:
             default:
-                text = "Type:txt";
-                contentTv.setText(TxtParser.parse(mJsonParser.getFastCodeList()));
+                text = "Custom:txt";
+                contentTv.setText(CustomTxtParser.parse(mJsonParser.getFastCodeList()));
                 break;
 
             case 1:
