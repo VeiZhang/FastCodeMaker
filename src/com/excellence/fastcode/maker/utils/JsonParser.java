@@ -61,7 +61,7 @@ public class JsonParser {
 
     public String parse(List<FastCode> fastCodeList) {
         mFastCodeList = fastCodeList;
-        return parse();
+        return parseList(mFastCodeList);
     }
 
     public List<FastCode> getFastCodeList() {
@@ -110,8 +110,8 @@ public class JsonParser {
         return success;
     }
 
-    public String parse() {
-        Collections.sort(mFastCodeList, new Comparator<FastCode>() {
+    public static String parseList(List<FastCode> fastCodeList) {
+        Collections.sort(fastCodeList, new Comparator<FastCode>() {
             @Override
             public int compare(FastCode o1, FastCode o2) {
                 return o1.getCode().compareTo(o2.getCode());
@@ -119,7 +119,7 @@ public class JsonParser {
         });
 
         Gson gson = new Gson();
-        return formatJson(gson.toJson(mFastCodeList));
+        return formatJson(gson.toJson(fastCodeList));
     }
 
     /**
@@ -196,7 +196,9 @@ public class JsonParser {
         }
     }
 
-    public static void saveFile(File savedFile, String content) throws Exception {
+    public static void saveFile(File savedFile, List<FastCode> fastCodeList) throws Exception {
+        String content = parseList(fastCodeList);
+
         FileOutputStream os = new FileOutputStream(savedFile);
         os.write(content.getBytes());
         os.close();

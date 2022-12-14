@@ -162,18 +162,18 @@ public class Controller implements Initializable {
                 AlertKit.showErrorAlert("Content can't be empty");
             } else {
                 mFileChooserInitPath = savedFile.getParent();
-                saveFile(savedFile, jsonContent, fileChooser.getSelectedExtensionFilter().getExtensions());
+                saveFile(savedFile, fileChooser.getSelectedExtensionFilter().getExtensions());
             }
         }
     }
 
-    private void saveFile(File savedFile, String jsonContent, List<String> extensions) {
+    private void saveFile(File savedFile, List<String> extensions) {
         if (savedFile != null) {
             if (isNotEmpty(extensions)) {
                 String suffix = extensions.get(0);
                 try {
                     if (suffix.endsWith(SUFFIX_JSON)) {
-                        JsonParser.saveFile(savedFile, jsonContent);
+                        JsonParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                     } else if (suffix.endsWith(SUFFIX_M3U)) {
                         M3uParser.saveFile(savedFile, mJsonParser.getFastCodeList());
                     } else {
@@ -248,7 +248,7 @@ public class Controller implements Initializable {
 
     private void loadContent() {
         String text = "Custom:txt";
-        String jsonContent = mJsonParser.parse();
+        String jsonContent = JsonParser.parseList(mJsonParser.getFastCodeList());
         switch (mContentType % 3) {
             case 0:
             default:
